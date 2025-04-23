@@ -1,35 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import "./Styles/styles.css";
+import { useEffect, useState } from "react";
+import Header from "./components/Header";
+import InfoCards from "./components/InfoCards";
+import DataTable from "./components/DataTable";
+import DetailsInfo from "./components/DetailsInfo";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import Footer from "./components/Footer";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="d-flex flex-column min-vh-100">
+        <Header />
+        <Toaster position="bottom-left" reverseOrder={false} />
+        <div>
+          {!isOnline && (
+            <div
+              className="alert alert-danger text-center w-100 position-fixed top-0 start-0"
+              style={{ zIndex: 1050, padding: "15px", fontSize: "18px" }}
+              role="alert"
+            >
+              ⚠️ You are offline. Some features may not work properly.
+            </div>
+          )}
+          {/* Main content area */}
+          <main className="flex-grow-1">
+            <Routes>
+              <Route path="/" element={<Navigate to="/auction" />} />
+              <Route
+                path="/auction"
+                element={
+                  <>
+                    <InfoCards />
+                    <DataTable />
+                  </>
+                }
+              />
+              <Route
+                path="/StateLp"
+                element={
+                  <>
+                    <InfoCards />
+                    <DataTable />
+                  </>
+                }
+              />
+              <Route
+                path="/info"
+                element={
+                  <>
+                    <DetailsInfo />
+                  </>
+                }
+              />
+            </Routes>
+          </main>
+        </div>
+        <Footer />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    </Router>
+  );
+};
 
-export default App
+export default App;
